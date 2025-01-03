@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -8,16 +8,7 @@ import {
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-
-const points = [
-  [35.7219, 51.3347],
-  [34.7219, 50.5347],
-  [33.7219, 49.1347],
-  [32.7219, 48.2347],
-  [31.7219, 47.1347],
-];
-
-const polylinePath = points;
+import useMapStore from "../../store/map";
 
 // Fix default icon issues in React
 delete L.Icon.Default.prototype._getIconUrl;
@@ -29,12 +20,21 @@ L.Icon.Default.mergeOptions({
 });
 
 function MapComponent() {
-  const position = [35.7219, 51.3347]; // Set map center coordinates (latitude, longitude)
+  const { mapPoints } = useMapStore();
+
+  const [centerPosition, setCenterPosition] = useState([35.7219, 51.3347]);
+
+  useEffect(() => {
+    if (mapPoints.length > 0) {
+      setCenterPosition([mapPoints[0].latitude, mapPoints[0].longitude]);
+    }
+  }, [mapPoints]);
 
   return (
     <MapContainer
-      center={position}
-      zoom={13}
+      center={centerPosition}
+      key={centerPosition[0]}
+      zoom={7}
       className="w-full aspect-[1/0.7]"
       style={{ direction: "ltr" }}
     >
@@ -45,14 +45,23 @@ function MapComponent() {
       />
 
       {/* Place markers for each point */}
-      {points.map((position, index) => (
-        <Marker key={index} position={position}>
-          <Popup>Point {index + 1}</Popup>
-        </Marker>
-      ))}
+      {mapPoints.length > 0 &&
+        mapPoints.map((position, index) => (
+          <Marker
+            key={index}
+            position={[position.latitude, position.longitude]}
+          >
+            <Popup>Point {index + 1}</Popup>
+          </Marker>
+        ))}
 
       {/* Draw a polyline connecting all points */}
-      <Polyline positions={polylinePath} color="blue" />
+      {mapPoints.length > 0 && (
+        <Polyline
+          positions={mapPoints.map((item) => [item.latitude, item.longitude])}
+          color="blue"
+        />
+      )}
     </MapContainer>
   );
 }

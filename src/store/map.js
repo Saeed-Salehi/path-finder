@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
-const useTeasersStore = create((set) => ({
+const useMapStore = create((set) => ({
   mapPoints: [],
   setMapPoints: (mapPoints) => set({ mapPoints }),
 }));
 
-export default useTeasersStore;
+export default useMapStore;
