@@ -139,7 +139,7 @@ function MapComponent() {
               key={index}
               position={[position?.latitude, position?.longitude]}
             >
-              <Popup>Point {index + 1}</Popup>
+              <Popup>{position?.latitude + ", " + position?.longitude}</Popup>
             </Marker>
           ))}
 
@@ -162,7 +162,7 @@ function MapComponent() {
               iconAnchor: [16, 16],
             })}
           >
-            <Popup>Car Position</Popup>
+            <Popup>{carPosition?.join(", ")}</Popup>
           </Marker>
         )}
       </MapContainer>
