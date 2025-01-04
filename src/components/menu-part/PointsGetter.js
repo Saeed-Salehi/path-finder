@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import useMapStore from "../../store/map";
 import FileUploader from "../common/FileUploader";
@@ -7,28 +7,33 @@ import TimePicker from "react-multi-date-picker/plugins/time_picker";
 
 const PointsGetter = () => {
   const { mapPoints, setMapPoints, setFilters, filters } = useMapStore();
+  const [fileName, setFileName] = useState("");
 
   const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+    try {
+      const file = event.target.files[0];
+      setFileName(file.name);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
 
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet);
 
-      const jsonData = XLSX.utils.sheet_to_json(sheet);
+        const sortedData = jsonData.sort(
+          (a, b) => new Date(a.datetime) - new Date(b.datetime)
+        );
 
-      const sortedData = jsonData.sort(
-        (a, b) => new Date(a.datetime) - new Date(b.datetime)
-      );
+        setMapPoints(sortedData);
+      };
 
-      setMapPoints(sortedData);
-    };
-
-    reader.readAsArrayBuffer(file);
+      reader.readAsArrayBuffer(file);
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   useEffect(() => {
@@ -53,6 +58,7 @@ const PointsGetter = () => {
         type="file"
         accept=".xlsx, .xls"
         onChange={handleFileUpload}
+        uploadedName={fileName}
       />
       {mapPoints.length > 0 && (
         <>

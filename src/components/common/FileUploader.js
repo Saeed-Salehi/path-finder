@@ -1,6 +1,6 @@
 import React from "react";
 
-const FileUploader = ({ ...inputProps }) => {
+const FileUploader = ({ uploadedName, ...inputProps }) => {
   return (
     <div className="flex items-center justify-center w-full">
       <label
@@ -28,6 +28,9 @@ const FileUploader = ({ ...inputProps }) => {
             drop
           </p>
           <p className="text-xs text-gray-500">{inputProps.accept}</p>
+          {uploadedName && (
+            <p className="text-xs text-gray-500">{uploadedName}</p>
+          )}
         </div>
         <input
           id="dropzone-file"
