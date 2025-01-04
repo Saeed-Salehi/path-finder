@@ -1,11 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import * as XLSX from "xlsx";
 import useMapStore from "../../store/map";
 import FileUploader from "../common/FileUploader";
-import Filter from "../filter/FilterForm";
+import DatePicker from "react-multi-date-picker";
+import TimePicker from "react-multi-date-picker/plugins/time_picker";
 
 const PointsGetter = () => {
-  const { mapPoints, setMapPoints, setFilters } = useMapStore();
+  const { mapPoints, setMapPoints, setFilters, filters } = useMapStore();
 
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
@@ -30,11 +31,20 @@ const PointsGetter = () => {
     reader.readAsArrayBuffer(file);
   };
 
-  const handleSubmitForm = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData);
-    setFilters(data);
+  useEffect(() => {
+    if (mapPoints.length > 0) {
+      setFilters({
+        start: mapPoints[0].datetime.valueOf(),
+        end: mapPoints[mapPoints.length - 1].datetime.valueOf(),
+      });
+    }
+  }, [mapPoints]);
+
+  const resetAction = () => {
+    setFilters({
+      start: mapPoints[0].datetime.valueOf(),
+      end: mapPoints[mapPoints.length - 1].datetime.valueOf(),
+    });
   };
 
   return (
@@ -45,13 +55,41 @@ const PointsGetter = () => {
         onChange={handleFileUpload}
       />
       {mapPoints.length > 0 && (
-        <form onSubmit={handleSubmitForm} className="mt-5">
-          <Filter />
-          <div className="flex justify-between">
-            <button type="reset">Reset</button>
-            <button type="submit">Set Filter</button>
+        <>
+          <div className="mt-3">
+            <DatePicker
+              placeholder="Start Datetime"
+              value={filters.start}
+              onChange={(d) => setFilters({ ...filters, start: d.valueOf() })}
+              editable={false}
+              minDate={mapPoints[0].datetime.valueOf()}
+              maxDate={filters.end}
+              format="YYYY-MM-DD HH:mm:ss"
+              inputClass="rmdp-input !rounded-[16px] !p-0"
+              calendarPosition={"bottom-end"}
+              plugins={[<TimePicker key={"TimePicker"} position="bottom" />]}
+            />
           </div>
-        </form>
+          <div className="mt-3">
+            <DatePicker
+              placeholder="End Datetime"
+              value={filters.end}
+              onChange={(d) => setFilters({ ...filters, end: d.valueOf() })}
+              editable={false}
+              minDate={filters.start}
+              maxDate={mapPoints[mapPoints.length - 1].datetime.valueOf()}
+              format="YYYY-MM-DD HH:mm:ss"
+              inputClass="rmdp-input !rounded-[16px] !p-0"
+              calendarPosition={"bottom-end"}
+              plugins={[<TimePicker key={"TimePicker"} position="bottom" />]}
+            />
+          </div>
+          <div className="flex justify-between mt-3">
+            <button type="reset" onClick={resetAction}>
+              Reset
+            </button>
+          </div>
+        </>
       )}
     </>
   );
