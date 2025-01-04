@@ -62,6 +62,7 @@ const PointsGetter = () => {
       />
       {mapPoints.length > 0 && (
         <>
+          <p className="font-semibold text-lg mt-3 pt-3 border-t border-dashed">Filter Point</p>
           <div className="mt-3">
             <DatePicker
               placeholder="Start Datetime"
