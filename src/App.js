@@ -3,18 +3,18 @@ import PointsGetter from "./components/menu-part/PointsGetter.js";
 
 function App() {
   return (
-    <div className="w-[90%] flex mx-auto min-h-screen py-10">
-      <div className="w-[25%] pl-4">
-        <div className="border h-full">
-          <div className="py-6 px-3">
-            <PointsGetter />
+    <div className="container flex flex-col mx-auto min-h-screen py-10 gap-4 lg:flex-row">
+      <div className="grow">
+        <div className="border rounded-2xl h-full">
+          <div className="p-6 h-[inherit]">
+            <MapComponent />
           </div>
         </div>
       </div>
-      <div className="w-[75%] pr-4">
-        <div className="border h-full">
-          <div className="p-6">
-            <MapComponent />
+      <div className="">
+        <div className="border h-full rounded-2xl">
+          <div className="py-6 px-3">
+            <PointsGetter />
           </div>
         </div>
       </div>
